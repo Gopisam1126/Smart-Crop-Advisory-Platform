@@ -1,10 +1,5 @@
-import {
-  createContext,
-  useState,
-  useCallback,
-  type ReactNode,
-  useMemo,
-} from "react";
+import { useState, useCallback, useMemo, type ReactNode } from "react";
+import { AuthContext } from "./AuthContext";
 import apiClient from "../api/appClient";
 import { tokenUtils } from "../utils/token";
 import type {
@@ -12,8 +7,6 @@ import type {
   loginCredentials,
   User,
 } from "../types/auth.types";
-
-export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() =>
@@ -26,7 +19,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       try {
         const { data } = await apiClient.post("/auth/login", credentials);
-
         tokenUtils.setTokens(data.accessToken, data.refreshToken);
         tokenUtils.setUser(data.user);
         setUser(data.user);
@@ -42,7 +34,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
-  // Memoize so consumers don't re-render on unrelated state changes
   const value = useMemo<AuthContextType>(
     () => ({
       user,
